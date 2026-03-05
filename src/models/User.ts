@@ -1,7 +1,7 @@
 // User model — single collection for both clients and freelancers
 import mongoose, { Schema, Document } from "mongoose";
-import { IUser } from "./types/user.types.js";
-import { UserRole } from "./types/enum.js";
+import { IUser } from "../types/user.types.js";
+import { UserRole } from "../types/enum.js";
 import bcrypt from "bcryptjs";
 const UserSchema = new Schema<IUser>(
   {
