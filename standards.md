@@ -391,3 +391,39 @@ Every file starts with a one-line comment explaining its purpose:
 
 * Every route must be documented with Swagger in Phase 8
 * README must be updated when new features are added
+
+## 17. GitHub Standards
+
+### Branch Strategy
+
+main → stable, production-ready code only. Never commit directly.
+develop → integration branch. Merge features here first.
+feature/xxx → new features. Branch from develop.
+fix/xxx → bug fixes. Branch from develop.
+chore/xxx → setup, config, tooling changes.
+
+### Flow
+
+develop → feature/auth → finish → PR into develop → merge → PR into main
+
+### PR Rules
+
+- Every PR must have a clear title and description
+- No PR merges without working code
+- One feature per PR — never mix features
+
+### Commit Message Format (Conventional Commits)
+
+feat: add user registration endpoint
+fix: resolve refresh token typo in logout
+chore: setup eslint and prettier
+refactor: move token logic to generateTokens utility
+test: add unit tests for authService
+
+### Rules
+
+- Never commit directly to main
+- Never commit .env files
+- Commit after every completed task
+- Keep commits small and focused
+- Write commit messages in present tense
