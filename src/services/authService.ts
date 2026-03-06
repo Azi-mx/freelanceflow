@@ -38,7 +38,7 @@ export const login = async (data: LoginInput, res: Response) => {
   const user = await User.findOne({ email: data.email }).select(
     "+password +refreshToken",
   );
-  if (!user) throw new AppError("Invalid Credentials", 401);
+  if (!user) throw new AppError("Invalid credentials", 401);
   const isValid = await user.comparePassword(data.password);
   if (!isValid) throw new AppError("Invalid credentials", 401);
   const accessToken = generateAccessToken(user._id.toString());
@@ -69,7 +69,7 @@ export const refreshToken = async (token: string, res: Response) => {
 
 export const logout = async (token: string, res: Response) => {
   if (!token) throw new AppError("No Token found", 401);
-  await User.findOneAndUpdate({ refreshToken: token }, { resfreshToken: null });
+  await User.findOneAndUpdate({ refreshToken: token }, { refreshToken: null });
   res.clearCookie("refreshToken", COOKIE_OPTIONS);
   return { message: "Logged out Succesfully" };
 };

@@ -375,3 +375,19 @@ Every file starts with a one-line comment explaining its purpose:
 | `console.log` in production code | Use a proper logger (Winston)      |
 | Skipping input validation        | Injection attacks, data corruption |
 | Committing `.env`                | Credential exposure                |
+
+## 16. Documentation Rules
+
+- Every function in services must have a JSDoc comment
+- Example:
+
+/\*\*
+
+- Registers a new user and returns tokens
+- @param data - validated register input
+- @param res - express response (for setting cookie)
+- @returns accessToken and user object
+  \*/
+
+* Every route must be documented with Swagger in Phase 8
+* README must be updated when new features are added
