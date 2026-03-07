@@ -18,6 +18,7 @@ export const config = {
   port: process.env["PORT"] ?? "5000",
   mongoUri: process.env["MONGO_URI"] as string,
   nodeEnv: process.env["NODE_ENV"] ?? "development",
+  clientUrl: process.env["CLIENT_URL"] ?? "http://localhost:3000",
   jwt: {
     accessSecret: process.env["JWT_ACCESS_SECRET"] as string,
     refreshSecret: process.env["JWT_REFRESH_SECRET"] as string,

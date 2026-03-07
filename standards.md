@@ -427,3 +427,26 @@ test: add unit tests for authService
 - Commit after every completed task
 - Keep commits small and focused
 - Write commit messages in present tense
+
+## 18. Testing Standards
+
+### Right Now — Manual Testing
+
+- Every API endpoint tested in Postman before moving forward
+- Save all requests in a Postman collection
+- Test happy path AND error cases
+
+### Phase 1 Complete — Unit Tests (Jest)
+
+- Every service function has a unit test
+- Test happy path, error cases, edge cases
+
+### Phase 3+ — Integration Tests (Supertest)
+
+- Test full request/response cycle
+- Test middleware, validation, auth
+
+### Frontend — E2E Tests (Cypress)
+
+- Test critical user flows only
+- Register, login, post project, submit bid

@@ -6,6 +6,14 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../utils/generateTokens.js";
+import {
+  clearRefreshTokenCookie,
+  setRefreshTokenCookie,
+} from "../utils/cookie.utils.js";
+import {
+  builUserResponse,
+  verifyRefreshToken,
+} from "../helpers/auth.helpers.js";
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -23,15 +31,10 @@ export const register = async (data: RegisterInput, res: Response) => {
 
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
-  res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
+  setRefreshTokenCookie(res, refreshToken);
   return {
     accessToken,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    },
+    user: builUserResponse(user),
   };
 };
 export const login = async (data: LoginInput, res: Response) => {
@@ -45,31 +48,30 @@ export const login = async (data: LoginInput, res: Response) => {
   const refreshToken = generateRefreshToken(user._id.toString());
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
-  res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
+  setRefreshTokenCookie(res, refreshToken);
   return {
     accessToken,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    },
+    user: builUserResponse(user),
   };
 };
 
 export const refreshToken = async (token: string, res: Response) => {
   if (!token) throw new AppError("No Refresh Token provided", 401);
-  const user = await User.findOne({ refreshToken: token }).select(
-    "+refreshToken",
-  );
+  verifyRefreshToken(token);
+  const user = await User.findOne({ refreshToken: token });
   if (!user) throw new AppError("Invalid Refresh token", 401);
-  const accessToken = generateAccessToken(user.id.toString());
-  return { accessToken };
+
+  const newAccessToken = generateAccessToken(user.id.toString());
+  const newRefreshToken = generateRefreshToken(user._id.toString());
+  user.refreshToken = newRefreshToken;
+  await user.save({ validateBeforeSave: false });
+  setRefreshTokenCookie(res, newRefreshToken);
+  return { accessToken: newAccessToken };
 };
 
 export const logout = async (token: string, res: Response) => {
   if (!token) throw new AppError("No Token found", 401);
   await User.findOneAndUpdate({ refreshToken: token }, { refreshToken: null });
-  res.clearCookie("refreshToken", COOKIE_OPTIONS);
+  clearRefreshTokenCookie(res);
   return { message: "Logged out Succesfully" };
 };
