@@ -6,6 +6,7 @@ import { config } from "./config/env.js";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
+import { authLimiter, globalLimiter } from "./middlewares/rateLimiter.js";
 const app = express();
 
 app.use(helmet());
@@ -17,7 +18,8 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
-app.use("/api/auth", authRoutes);
+app.use(globalLimiter);
+app.use("/api/auth", authLimiter, authRoutes);
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", env: config.nodeEnv });
 });
