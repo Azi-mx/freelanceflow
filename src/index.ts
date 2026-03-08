@@ -2,22 +2,30 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { config } from "./config/env";
-import { connectDB } from "./config/db";
-
+import dns from "dns";
+import { config } from "./config/env.js";
+import { connectDB } from "./config/db.js";
+import authRoutes from "./routes/auth.routes.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
+import { authLimiter, globalLimiter } from "./middlewares/rateLimiter.js";
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: config.clientUrl,
+    credentials: true,
+  }),
+);
 app.use(cookieParser());
 app.use(express.json());
-
-app.get("health", (_req, res) => {
+app.use(globalLimiter);
+app.use("/api/auth", authLimiter, authRoutes);
+app.get("/health", (_req, res) => {
   res.json({ status: "ok", env: config.nodeEnv });
 });
-
+app.use(errorHandler);
 const start = async (): Promise<void> => {
-  const dns = require("dns");
   dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
   await connectDB();
   app.listen(config.port, () => {
