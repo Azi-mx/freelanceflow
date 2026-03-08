@@ -2,6 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import dns from "dns";
 import { config } from "./config/env.js";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -25,7 +26,6 @@ app.get("/health", (_req, res) => {
 });
 app.use(errorHandler);
 const start = async (): Promise<void> => {
-  const dns = require("dns");
   dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
   await connectDB();
   app.listen(config.port, () => {

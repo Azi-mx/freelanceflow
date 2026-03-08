@@ -3,15 +3,19 @@ import { AppError } from "../utils/AppError";
 import { config } from "../config/env";
 import { User } from "../models/User";
 
-export const verifyRefreshToken = async (token: string) => {
+interface ITokenPayload {
+  id: string;
+}
+export const verifyRefreshToken = (token: string): ITokenPayload => {
   try {
-    verify(token, config.jwt.refreshSecret);
+    const decoded = verify(token, config.jwt.refreshSecret) as ITokenPayload;
+    return decoded;
   } catch (error) {
     throw new AppError("Invalid refresh token", 401);
   }
 };
 
-export const builUserResponse = (user: InstanceType<typeof User>) => {
+export const buildUserResponse = (user: InstanceType<typeof User>) => {
   return {
     id: user.id,
     email: user.email,

@@ -8,7 +8,7 @@ export interface IUser extends Document {
   role: UserRole;
   avatar?: string;
   isVerified: boolean;
-  refreshToken?: string;
+  refreshToken?: string | undefined;
   //Freelancer Specific
   bio?: string;
   skills?: string[];
