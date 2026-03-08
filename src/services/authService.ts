@@ -23,7 +23,7 @@ export const register = async (data: RegisterInput, res: Response) => {
 
   const user = await User.create(data);
   const refreshToken = generateRefreshToken(user._id.toString());
-  const accessToken = generateAccessToken(user._id.toString());
+  const accessToken = generateAccessToken(user._id.toString(), user.role);
 
   user.refreshToken = await hashToken(refreshToken);
   await user.save({ validateBeforeSave: false });
@@ -40,7 +40,7 @@ export const login = async (data: LoginInput, res: Response) => {
   if (!user) throw new AppError("Invalid credentials", 401);
   const isValid = await user.comparePassword(data.password);
   if (!isValid) throw new AppError("Invalid credentials", 401);
-  const accessToken = generateAccessToken(user._id.toString());
+  const accessToken = generateAccessToken(user._id.toString(), user.role);
   const refreshToken = generateRefreshToken(user._id.toString());
   user.refreshToken = await hashToken(refreshToken);
   await user.save({ validateBeforeSave: false });
@@ -65,7 +65,7 @@ export const refreshToken = async (token: string, res: Response) => {
 
   if (!isMatch) throw new AppError("Invalid Refresh token", 401);
 
-  const newAccessToken = generateAccessToken(user._id.toString());
+  const newAccessToken = generateAccessToken(user._id.toString(), user.role);
   const newRefreshToken = generateRefreshToken(user._id.toString());
 
   const hashedNewRefreshToken = await hashToken(newRefreshToken);

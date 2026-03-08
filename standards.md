@@ -450,3 +450,45 @@ test: add unit tests for authService
 
 - Test critical user flows only
 - Register, login, post project, submit bid
+
+## 15. Scalability & Future-Proofing Rules
+
+Every design decision must answer this question:
+**"If requirements change tomorrow, how much do I need to rewrite?"**
+
+The answer should always be — **as little as possible.**
+
+### Rules
+
+- **Design for extension, not modification** — adding new features should not require rewriting existing code
+- **Use rest parameters for roles** — never hardcode a single role when a route might support multiple in future
+- **Use enums for all fixed values** — adding a new status/role/type is one line change in enums.ts
+- **Never hardcode strings** — use constants and enums so changes happen in one place
+- **Build middleware to be composable** — `authMiddleware, roleMiddleware("client", "admin")` not one giant middleware
+- **Config over code** — behavior that might change goes in config, not hardcoded in logic
+
+### Examples
+
+```typescript
+// ❌ Not scalable
+roleMiddleware("client");
+
+// ✅ Scalable
+roleMiddleware("client", "admin");
+
+// ❌ Not scalable
+if (status === "active" || status === "pending") {
+}
+
+// ✅ Scalable
+if ([ContractStatus.ACTIVE, ContractStatus.PENDING].includes(status)) {
+}
+```
+
+### The Rule In One Line
+
+> **Every function, middleware, and config should be open for extension but closed for modification.**
+
+This is the **Open/Closed Principle** — one of the most important rules in software engineering.
+
+---
