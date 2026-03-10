@@ -9,8 +9,10 @@ export interface IUser extends Document {
   avatar?: string;
   isVerified: boolean;
   refreshToken?: string | undefined;
+  location?: string;
   //Freelancer Specific
   bio?: string;
+  savedJobs?: string[];
   skills?: string[];
   hourlyRate?: number;
   portfolio?: string[];

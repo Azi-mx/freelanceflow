@@ -32,6 +32,10 @@ const UserSchema = new Schema<IUser>(
       required: [true, "Role is Required"],
     },
     avatar: String,
+    location: String,
+    savedJobs: {
+      type: [String],
+    },
     isVerified: { type: Boolean, default: false },
     refreshToken: { type: String, select: false },
     bio: { type: String, maxLength: 500 },
