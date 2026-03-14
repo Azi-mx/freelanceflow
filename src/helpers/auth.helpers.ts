@@ -1,11 +1,9 @@
 import { verify } from "jsonwebtoken";
-import { AppError } from "../utils/AppError";
-import { config } from "../config/env";
-import { User } from "../models/User";
+import { AppError } from "../utils/AppError.js";
+import { config } from "../config/env.js";
+import { User } from "../models/User.js";
+import { ITokenPayload } from "../types/auth.types.js";
 
-interface ITokenPayload {
-  id: string;
-}
 export const verifyRefreshToken = (token: string): ITokenPayload => {
   try {
     const decoded = verify(token, config.jwt.refreshSecret) as ITokenPayload;
