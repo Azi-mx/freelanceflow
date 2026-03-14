@@ -28,6 +28,10 @@ app.use("/api/projects", projectRoutes);
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", env: config.nodeEnv });
 });
+app.use((req, _res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
 app.use(errorHandler);
 const start = async (): Promise<void> => {
   dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);

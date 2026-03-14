@@ -2,6 +2,7 @@ import { verify } from "jsonwebtoken";
 import { config } from "../config/env.js";
 import { AppError } from "../utils/AppError.js";
 import { NextFunction, Request, Response } from "express";
+import { UserRole } from "../types/enum.js";
 
 export const authMiddleware = (
   req: Request,
@@ -17,7 +18,7 @@ export const authMiddleware = (
       id: string;
       role: string;
     };
-    req.user = { id: decoded.id, role: decoded.role };
+    req.user = { id: decoded.id, role: decoded.role as UserRole };
     next();
   } catch (error) {
     next(error);

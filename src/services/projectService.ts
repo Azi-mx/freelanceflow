@@ -41,11 +41,13 @@ export const getProjectById = async (projectId: string) => {
   return project;
 };
 export const saveProject = async (freelancerId: string, projectId: string) => {
-  const project = await Project.findByIdAndUpdate(projectId, {
-    $addToSet: { savedBy: freelancerId },
-  });
+  const project = await Project.findByIdAndUpdate(
+    projectId,
+    { $addToSet: { savedBy: freelancerId } },
+    { new: true },
+  );
   if (!project) throw new AppError("Project not found", 404);
-  return project;
+  return { message: "Project saved successfully" };
 };
 
 export const getProjects = async (

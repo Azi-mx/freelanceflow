@@ -34,7 +34,7 @@ router.delete(
 router.post(
   "/:id/save",
   authMiddleware,
-  roleMiddleware("freelancer"),
+  roleMiddleware(UserRole.FREELANCER),
   saveProject,
 );
 export default router;
