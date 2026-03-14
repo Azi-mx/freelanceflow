@@ -9,6 +9,7 @@ import authRoutes from "./routes/auth.routes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { authLimiter, globalLimiter } from "./middlewares/rateLimiter.js";
 import profilesRoutes from "./routes/profiles.routes.js";
+import projectRoutes from "./routes/project.routes.js";
 const app = express();
 
 app.use(helmet());
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(globalLimiter);
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/profiles", profilesRoutes);
+app.use("/api/projects", projectRoutes);
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", env: config.nodeEnv });
 });
