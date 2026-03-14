@@ -6,18 +6,19 @@ import {
 } from "../controllers/profileController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
+import { UserRole } from "../types/enum.js";
 const router = Router();
 
 router.put(
   "/freelancer",
   authMiddleware,
-  roleMiddleware("freelancer"),
+  roleMiddleware(UserRole.FREELANCER),
   updateFreelancerProfile,
 );
 router.put(
   "/client",
   authMiddleware,
-  roleMiddleware("client"),
+  roleMiddleware(UserRole.CLIENT),
   updateClientProfile,
 );
 router.get("/me", authMiddleware, getProfile);
