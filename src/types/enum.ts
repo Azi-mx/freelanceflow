@@ -24,3 +24,9 @@ export enum ProjectStatus {
   COMPLETED = "completed",
   CANCELLED = "cancelled",
 }
+export enum BidStatus {
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+  WITHDRAWN = "withdrawn",
+}

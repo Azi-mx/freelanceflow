@@ -492,3 +492,73 @@ if ([ContractStatus.ACTIVE, ContractStatus.PENDING].includes(status)) {
 This is the **Open/Closed Principle** — one of the most important rules in software engineering.
 
 ---
+
+## 19. Docker Best Practices
+
+1. Use a `.dockerignore` file — exclude `.git`, `node_modules`, secrets
+2. Clean up in the same layer — `apt-get install && rm -rf /var/lib/apt/lists/*` in one RUN
+3. Never use `ENV` for secrets — use `ARG` for build-time, volume mounts for runtime
+4. Run as non-root user — create `appuser`, switch with `USER` instruction
+5. Optimize cache ordering — copy `package.json` first, run `npm ci`, then copy source code
+6. Pin versions — use `node:20-alpine` not `node:latest`
+7. Use minimal base images — `alpine`, `distroless`, or `-slim` tags
+8. Use multi-stage builds — compile in stage 1, copy only output to stage 2
+9. Add `HEALTHCHECK` — verify app is actually working, not just running
+10. Combine `RUN` instructions — use `&& \` to reduce layer count
+
+**Node.js specific:**
+
+```dockerfile
+# ✅ Always use this — npm doesn't forward OS signals properly
+CMD ["node", "dist/index.js"]
+
+# ❌ Never use this — causes broken container shutdowns
+CMD ["npm", "start"]
+```
+
+---
+
+## 20. AI-Assisted Development Practices
+
+- **Plan first** — write plan to `tasks/todo.md` with checkable items before any implementation
+- **Verify plan** — check in before starting implementation
+- **Track progress** — mark items complete as you go
+- **Capture lessons** — update `tasks/lessons.md` after every correction or mistake
+- **Verification before done** — never mark task complete without proving it works
+- **Demand elegance** — for non-trivial changes, ask "is there a more elegant solution?"
+- **Simplicity first** — make every change as simple as possible, minimal code impact
+
+---
+
+## 21. Node.js Production Standards
+
+```typescript
+// ✅ Always register unhandled rejection handler in entry point
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+  process.exit(1);
+});
+
+// ✅ Always use return await — never return a bare promise
+// Reason: missing await drops function from error stack trace
+const getUser = async (id: string) => {
+  return await User.findById(id); // ✅
+  return User.findById(id); // ❌ — lost from stack trace on error
+};
+
+// ✅ Subscribe to Mongoose connection events
+mongoose.connection.on("error", (err) => console.error("Mongoose error:", err));
+mongoose.connection.on("disconnected", () =>
+  console.warn("MongoDB disconnected"),
+);
+
+// ✅ Validate NODE_ENV in Zod env config
+NODE_ENV: z.enum(["development", "production", "test"]);
+```
+
+**Rules:**
+
+- Use `npm ci` instead of `npm install` in Dockerfile and CI pipeline — `npm ci` strictly follows `package-lock.json`, `npm install` can silently upgrade packages
+- Never use `npm start` in Docker — use `node dist/index.js` directly
+
+---
