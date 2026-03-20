@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import * as authService from "../services/authService.js";
-import { loginSchema, registerSchema } from "../validations/auth.validation.js";
 import {
   clearRefreshTokenCookie,
   setRefreshTokenCookie,

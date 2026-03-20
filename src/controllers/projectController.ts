@@ -1,9 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import * as projectService from "../services/projectService.js";
-import {
-  createProjectSchema,
-  updateProjectSchema,
-} from "../validations/project.validation.js";
 
 export const createProject = async (
   req: Request,

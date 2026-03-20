@@ -1,9 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import * as profileService from "../services/profileService.js";
-import {
-  updateClientSchema,
-  updateFreelancerSchema,
-} from "../validations/profile.validation.js";
+
 export const updateFreelancerProfile = async (
   req: Request,
   res: Response,
