@@ -11,6 +11,8 @@ import {
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { roleMiddleware } from "../middlewares/roleMiddleware.js";
 import { UserRole } from "../types/enum.js";
+import { validate } from "../middlewares/validate.js";
+import { createBidSchema } from "../validations/bid.validation.js";
 
 const router = Router();
 
@@ -48,6 +50,7 @@ router.post(
   "/:projectId/createBid",
   authMiddleware,
   roleMiddleware(UserRole.FREELANCER),
+  validate(createBidSchema),
   createBid,
 );
 router.get(

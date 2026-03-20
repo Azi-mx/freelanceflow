@@ -11,10 +11,13 @@ export const createBid = async (
   next: NextFunction,
 ) => {
   try {
-    const data = createBidSchema.parse(req.body);
     const freelancerId = req.user!.id;
     const projectId = req.params.projectId as string;
-    const result = await bidService.createBid(data, projectId, freelancerId);
+    const result = await bidService.createBid(
+      req.body,
+      projectId,
+      freelancerId,
+    );
     res.status(201).json({ success: true, data: result });
   } catch (error) {
     next(error);
