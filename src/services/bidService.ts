@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Bid } from "../models/Bid.js";
 import { Project } from "../models/Project.js";
 import { BidStatus, ProjectStatus } from "../types/enum.js";
@@ -50,27 +51,42 @@ export const updateBid = async (
 };
 
 export const acceptBid = async (bidId: string, clientId: string) => {
-  const bid = await Bid.findOne({
-    _id: bidId,
-    clientId,
-  });
-  if (!bid) throw new AppError("Bid not found", 404);
-  if (bid.status !== BidStatus.PENDING) {
-    throw new AppError("Bid is not pending", 400);
+  const session = await mongoose.startSession();
+  try {
+    const bid = await Bid.findOneAndUpdate(
+      { _id: bidId, clientId, status: BidStatus.PENDING },
+      { status: BidStatus.ACCEPTED },
+      { new: true, session },
+    );
+    if (!bid) throw new AppError("Bid not found", 404);
+    const project = await Project.findById(
+      { _id: bid.projectId, status: ProjectStatus.OPEN },
+      null,
+      { session },
+    );
+    if (!project) {
+      throw new AppError("Project is not open", 400);
+    }
+    await session.withTransaction(async () => {
+      await Promise.all([
+        Bid.updateMany(
+          { projectId: bid.projectId, _id: { $ne: bidId } },
+          { status: BidStatus.REJECTED },
+          { session },
+        ),
+        Project.updateOne(
+          { _id: bid.projectId },
+          { status: ProjectStatus.IN_PROGRESS, freelancerId: bid.freelancerId },
+          { session },
+        ),
+      ]);
+      return { message: "Bid accepted successfully" };
+    });
+  } catch (error) {
+    throw error;
+  } finally {
+    await session.endSession();
   }
-
-  await Promise.all([
-    Bid.updateOne({ _id: bidId }, { status: BidStatus.ACCEPTED }),
-    Bid.updateMany(
-      { projectId: bid.projectId, _id: { $ne: bidId } },
-      { status: BidStatus.REJECTED },
-    ),
-    Project.updateOne(
-      { _id: bid.projectId },
-      { status: ProjectStatus.IN_PROGRESS, freelancerId: bid.freelancerId },
-    ),
-  ]);
-  return { message: "Bid accepted successfully" };
 };
 export const rejectBid = async (bidId: string, clientId: string) => {
   const bid = await Bid.findOne({ _id: bidId, clientId });
