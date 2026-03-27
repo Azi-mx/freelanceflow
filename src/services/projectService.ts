@@ -81,10 +81,10 @@ export const getProjects = async (
   const [projects, total] = await Promise.all([
     Project.find(query)
       .populate("clientId", "name email avatar companyName")
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .lean()
-      .sort({ createdAt: -1 }),
+      .lean(),
     Project.countDocuments(query),
   ]);
   return {

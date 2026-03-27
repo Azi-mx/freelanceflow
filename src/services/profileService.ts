@@ -1,4 +1,5 @@
 import { User } from "../models/User.js";
+import { UserRole } from "../types/enum.js";
 import { AppError } from "../utils/AppError.js";
 import {
   UpdateClientInput,
@@ -11,7 +12,8 @@ export const updateFreelancerProfile = async (
 ) => {
   const user = await User.findById(user_id);
   if (!user) throw new AppError("User not found", 404);
-  if (user.role !== "freelancer") throw new AppError("Access Denied", 403);
+  if (user.role !== UserRole.FREELANCER)
+    throw new AppError("Access Denied", 403);
 
   const { name, bio, skills, avatar, hourlyRate, portfolio, availability } =
     data;

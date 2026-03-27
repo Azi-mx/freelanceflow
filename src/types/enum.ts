@@ -30,3 +30,9 @@ export enum BidStatus {
   REJECTED = "rejected",
   WITHDRAWN = "withdrawn",
 }
+export enum ProjectLength {
+  LESS_THAN_ONE_MONTH = "less_than_one_month",
+  ONE_TO_THREE_MONTHS = "one_to_three_months",
+  THREE_TO_SIX_MONTHS = "three_to_six_months",
+  MORE_THAN_SIX_MONTHS = "more_than_six_months",
+}

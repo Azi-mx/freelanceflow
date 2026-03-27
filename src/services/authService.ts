@@ -1,4 +1,3 @@
-import { Response } from "express";
 import { LoginInput, RegisterInput } from "../validations/auth.validation.js";
 import { User } from "../models/User.js";
 import { AppError } from "../utils/AppError.js";
@@ -7,10 +6,6 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../utils/generateTokens.js";
-import {
-  clearRefreshTokenCookie,
-  setRefreshTokenCookie,
-} from "../utils/cookie.utils.js";
 import {
   buildUserResponse,
   verifyRefreshToken,
@@ -88,5 +83,4 @@ export const logout = async (token: string) => {
   if (!isMatch) throw new AppError("Invalid Refresh token", 401);
   user.refreshToken = undefined;
   await user.save({ validateBeforeSave: false });
-  return { message: "Logged out Succesfully" };
 };
