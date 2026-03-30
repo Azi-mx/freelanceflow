@@ -45,6 +45,8 @@ const UserSchema = new Schema<IUser>(
     availability: { type: Boolean, default: true },
     companyName: { type: String },
     website: { type: String },
+    avgRating: { type: Number, default: 0, min: 0, max: 5 },
+    reviewCount: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

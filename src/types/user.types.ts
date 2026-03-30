@@ -20,6 +20,9 @@ export interface IUser extends Document {
   //Client Specific
   companyName?: string;
   website?: string;
+  //Review fields
+  avgRating: number;
+  reviewCount: number;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;

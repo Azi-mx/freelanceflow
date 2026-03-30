@@ -12,6 +12,7 @@ import profilesRoutes from "./routes/profiles.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import bidRoutes from "./routes/bid.routes.js";
 import contractRoutes from "./routes/contract.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 const app = express();
 
 app.use(helmet());
@@ -29,6 +30,7 @@ app.use("/api/profiles", profilesRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/bids", bidRoutes);
 app.use("/api/contracts", contractRoutes);
+app.use("/api/reviews", reviewRoutes);
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", env: config.nodeEnv });
 });
