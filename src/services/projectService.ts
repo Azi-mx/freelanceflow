@@ -1,3 +1,4 @@
+import { PROJECT_LENGTH_THRESHOLD } from "../config/constants.js";
 import { Project } from "../models/Project.js";
 import { AppError } from "../utils/AppError.js";
 import {
@@ -9,7 +10,19 @@ export const createProject = async (
   data: CreateProjectInput,
   clientId: string,
 ) => {
-  const project = await Project.create({ ...data, clientId });
+  const days = Math.ceil(
+    (new Date(data.deadline).getTime() - new Date().getTime()) /
+      (1000 * 60 * 60 * 24),
+  );
+  if (days <= 0) throw new AppError("Deadline must be in the future", 400);
+  const projectLength = PROJECT_LENGTH_THRESHOLD.find(
+    (threshold) => days <= threshold.max,
+  );
+  const project = await Project.create({
+    ...data,
+    clientId,
+    projectLength: projectLength?.value as string,
+  });
   return project;
 };
 export const updateProject = async (

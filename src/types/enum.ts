@@ -36,3 +36,9 @@ export enum ProjectLength {
   THREE_TO_SIX_MONTHS = "three_to_six_months",
   MORE_THAN_SIX_MONTHS = "more_than_six_months",
 }
+export enum ContractStatus {
+  ACTIVE = "active",
+  COMPLETED = "completed",
+  TERMINATED_BY_CLIENT = "terminated_by_client",
+  TERMINATED_BY_FREELANCER = "terminated_by_freelancer",
+}

@@ -5,7 +5,7 @@ export const createBidSchema = z.object({
   bidAmount: z
     .number()
     .min(1, { message: "Bid amount must be greater than 0" }),
-  timeline: z.string().min(1),
+  timeline: z.number().min(1).max(365),
   attachments: z.array(z.url()).default([]),
 });
 export const updateBidSchema = createBidSchema.partial();

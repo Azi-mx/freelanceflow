@@ -7,6 +7,7 @@ import {
   CreateBidInput,
   UpdateBidInput,
 } from "../validations/bid.validation.js";
+import { createContract } from "./contractService.js";
 
 export const createBid = async (
   data: CreateBidInput,
@@ -69,14 +70,7 @@ export const acceptBid = async (bidId: string, clientId: string) => {
         { new: true, session },
       );
       if (!bid) throw new AppError("Bid not found", 404);
-      const project = await Project.findOne(
-        { _id: bid.projectId, status: ProjectStatus.OPEN },
-        null,
-        { session },
-      );
-      if (!project) {
-        throw new AppError("Project is not open", 400);
-      }
+
       await Promise.all([
         Bid.updateMany(
           { projectId: bid.projectId, _id: { $ne: bidId } },
@@ -88,6 +82,7 @@ export const acceptBid = async (bidId: string, clientId: string) => {
           { status: ProjectStatus.IN_PROGRESS, freelancerId: bid.freelancerId },
           { session },
         ),
+        createContract(bid, session),
       ]);
       const projectUpdate = await Project.updateOne(
         { _id: bid.projectId, status: ProjectStatus.OPEN },
