@@ -1,9 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import * as projectService from "../services/projectService.js";
-import {
-  createProjectSchema,
-  updateProjectSchema,
-} from "../validations/project.validation.js";
 
 export const createProject = async (
   req: Request,
@@ -11,9 +7,8 @@ export const createProject = async (
   next: NextFunction,
 ) => {
   try {
-    const data = createProjectSchema.parse(req.body);
     const clientId = req.user!.id;
-    const result = await projectService.createProject(data, clientId);
+    const result = await projectService.createProject(req.body, clientId);
     res.status(201).json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -25,11 +20,10 @@ export const updateProject = async (
   next: NextFunction,
 ) => {
   try {
-    const data = updateProjectSchema.parse(req.body);
     const projectId = req.params.id as string;
     const clientId = req.user!.id;
     const result = await projectService.updateProject(
-      data,
+      req.body,
       projectId,
       clientId,
     );

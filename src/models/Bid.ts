@@ -33,8 +33,10 @@ const BidSchema = new Schema<IBid>(
       default: BidStatus.PENDING,
     },
     timeline: {
-      type: String,
+      type: Number,
       required: [true, "Timeline is required"],
+      min: 1,
+      max: 365,
     },
     attachments: {
       type: [String],

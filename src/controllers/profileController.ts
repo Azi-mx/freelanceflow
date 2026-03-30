@@ -1,19 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import * as profileService from "../services/profileService.js";
-import {
-  updateClientSchema,
-  updateFreelancerSchema,
-} from "../validations/profile.validation.js";
+
 export const updateFreelancerProfile = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const data = updateFreelancerSchema.parse(req.body);
     const result = await profileService.updateFreelancerProfile(
       req.user!.id,
-      data,
+      req.body,
     );
     res.status(200).json({ success: true, data: result });
   } catch (error) {
@@ -27,8 +23,10 @@ export const updateClientProfile = async (
   next: NextFunction,
 ) => {
   try {
-    const data = updateClientSchema.parse(req.body);
-    const result = await profileService.updateClientProfile(req.user!.id, data);
+    const result = await profileService.updateClientProfile(
+      req.user!.id,
+      req.body,
+    );
     res.status(200).json({ success: true, data: result });
   } catch (error) {
     next(error);

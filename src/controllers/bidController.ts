@@ -1,8 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import {
-  createBidSchema,
-  updateBidSchema,
-} from "../validations/bid.validation.js";
 import * as bidService from "../services/bidService.js";
 
 export const createBid = async (
@@ -11,10 +7,13 @@ export const createBid = async (
   next: NextFunction,
 ) => {
   try {
-    const data = createBidSchema.parse(req.body);
     const freelancerId = req.user!.id;
     const projectId = req.params.projectId as string;
-    const result = await bidService.createBid(data, projectId, freelancerId);
+    const result = await bidService.createBid(
+      req.body,
+      projectId,
+      freelancerId,
+    );
     res.status(201).json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -27,10 +26,9 @@ export const updateBid = async (
   next: NextFunction,
 ) => {
   try {
-    const data = updateBidSchema.parse(req.body);
     const freelancerId = req.user!.id;
     const bidId = req.params.bidId as string;
-    const result = await bidService.updateBid(data, bidId, freelancerId);
+    const result = await bidService.updateBid(req.body, bidId, freelancerId);
     res.status(200).json({ success: true, data: result });
   } catch (error) {
     next(error);

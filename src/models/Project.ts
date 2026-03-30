@@ -1,6 +1,11 @@
 import mongoose, { Schema } from "mongoose";
 import { IProject } from "../types/project.types.js";
-import { JobType, ProjectCategory, ProjectStatus } from "../types/enum.js";
+import {
+  JobType,
+  ProjectCategory,
+  ProjectLength,
+  ProjectStatus,
+} from "../types/enum.js";
 
 const ProjectSchema = new Schema<IProject>(
   {
@@ -23,12 +28,7 @@ const ProjectSchema = new Schema<IProject>(
     },
     projectLength: {
       type: String,
-      enum: [
-        "less_than_1_month", // for finding projects by project length
-        "1_to_3_months",
-        "3_to_6_months",
-        "more_than_6_months",
-      ],
+      enum: Object.values(ProjectLength),
       required: true,
     },
     deadline: {

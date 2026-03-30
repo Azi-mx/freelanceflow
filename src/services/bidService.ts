@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Bid } from "../models/Bid.js";
 import { Project } from "../models/Project.js";
 import { BidStatus, ProjectStatus } from "../types/enum.js";
@@ -6,6 +7,7 @@ import {
   CreateBidInput,
   UpdateBidInput,
 } from "../validations/bid.validation.js";
+import { createContract } from "./contractService.js";
 
 export const createBid = async (
   data: CreateBidInput,
@@ -29,7 +31,15 @@ export const createBid = async (
     freelancerId,
     clientId: project.clientId,
   });
-  return bid;
+  return {
+    id: bid._id,
+    projectId: bid.projectId,
+    bidAmount: bid.bidAmount,
+    timeline: bid.timeline,
+    status: bid.status,
+    coverLetter: bid.coverLetter,
+    createdAt: bid.createdAt,
+  };
 };
 
 export const updateBid = async (
@@ -41,6 +51,7 @@ export const updateBid = async (
     {
       _id: bidId,
       freelancerId: freelancerId,
+      status: BidStatus.PENDING,
     },
     data,
     { new: true },
@@ -50,27 +61,44 @@ export const updateBid = async (
 };
 
 export const acceptBid = async (bidId: string, clientId: string) => {
-  const bid = await Bid.findOne({
-    _id: bidId,
-    clientId,
-  });
-  if (!bid) throw new AppError("Bid not found", 404);
-  if (bid.status !== BidStatus.PENDING) {
-    throw new AppError("Bid is not pending", 400);
-  }
+  const session = await mongoose.startSession();
+  try {
+    await session.withTransaction(async () => {
+      const bid = await Bid.findOneAndUpdate(
+        { _id: bidId, clientId, status: BidStatus.PENDING },
+        { status: BidStatus.ACCEPTED },
+        { new: true, session },
+      );
+      if (!bid) throw new AppError("Bid not found", 404);
 
-  await Promise.all([
-    Bid.updateOne({ _id: bidId }, { status: BidStatus.ACCEPTED }),
-    Bid.updateMany(
-      { projectId: bid.projectId, _id: { $ne: bidId } },
-      { status: BidStatus.REJECTED },
-    ),
-    Project.updateOne(
-      { _id: bid.projectId },
-      { status: ProjectStatus.IN_PROGRESS, freelancerId: bid.freelancerId },
-    ),
-  ]);
-  return { message: "Bid accepted successfully" };
+      await Promise.all([
+        Bid.updateMany(
+          { projectId: bid.projectId, _id: { $ne: bidId } },
+          { status: BidStatus.REJECTED },
+          { session },
+        ),
+        Project.updateOne(
+          { _id: bid.projectId },
+          { status: ProjectStatus.IN_PROGRESS, freelancerId: bid.freelancerId },
+          { session },
+        ),
+        createContract(bid, session),
+      ]);
+      const projectUpdate = await Project.updateOne(
+        { _id: bid.projectId, status: ProjectStatus.OPEN },
+        { status: ProjectStatus.IN_PROGRESS, freelancerId: bid.freelancerId },
+        { session },
+      );
+      if (projectUpdate.modifiedCount === 0) {
+        throw new AppError("Project is no longer open", 400);
+      }
+      return { message: "Bid accepted successfully" };
+    });
+  } catch (error) {
+    throw error;
+  } finally {
+    await session.endSession();
+  }
 };
 export const rejectBid = async (bidId: string, clientId: string) => {
   const bid = await Bid.findOne({ _id: bidId, clientId });
@@ -95,7 +123,7 @@ export const withdrawBid = async (bidId: string, freelancerId: string) => {
 };
 export const getBidsByFreelancer = async (freelancerId: string) => {
   const bids = await Bid.find({ freelancerId })
-    .populate("projectId", " title budget status category")
+    .populate("projectId", "title budget status category")
     .lean();
   return bids;
 };
