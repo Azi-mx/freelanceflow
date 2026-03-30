@@ -1,4 +1,3 @@
-import { Response } from "express";
 import { LoginInput, RegisterInput } from "../validations/auth.validation.js";
 import { User } from "../models/User.js";
 import { AppError } from "../utils/AppError.js";
@@ -8,16 +7,12 @@ import {
   generateRefreshToken,
 } from "../utils/generateTokens.js";
 import {
-  clearRefreshTokenCookie,
-  setRefreshTokenCookie,
-} from "../utils/cookie.utils.js";
-import {
   buildUserResponse,
   verifyRefreshToken,
 } from "../helpers/auth.helpers.js";
 import { hashToken } from "../utils/hashToken.js";
 
-export const register = async (data: RegisterInput, res: Response) => {
+export const register = async (data: RegisterInput) => {
   const existing = await User.findOne({ email: data.email });
   if (existing) throw new AppError("Email already in use", 409);
 
@@ -27,13 +22,13 @@ export const register = async (data: RegisterInput, res: Response) => {
 
   user.refreshToken = await hashToken(refreshToken);
   await user.save({ validateBeforeSave: false });
-  setRefreshTokenCookie(res, refreshToken);
   return {
     accessToken,
+    refreshToken,
     user: buildUserResponse(user),
   };
 };
-export const login = async (data: LoginInput, res: Response) => {
+export const login = async (data: LoginInput) => {
   const user = await User.findOne({ email: data.email }).select(
     "+password +refreshToken",
   );
@@ -44,14 +39,14 @@ export const login = async (data: LoginInput, res: Response) => {
   const refreshToken = generateRefreshToken(user._id.toString());
   user.refreshToken = await hashToken(refreshToken);
   await user.save({ validateBeforeSave: false });
-  setRefreshTokenCookie(res, refreshToken);
   return {
     accessToken,
+    refreshToken,
     user: buildUserResponse(user),
   };
 };
 
-export const refreshToken = async (token: string, res: Response) => {
+export const refreshToken = async (token: string) => {
   if (!token) throw new AppError("No Refresh Token provided", 401);
 
   const decoded = verifyRefreshToken(token);
@@ -74,12 +69,10 @@ export const refreshToken = async (token: string, res: Response) => {
 
   await user.save({ validateBeforeSave: false });
 
-  setRefreshTokenCookie(res, newRefreshToken);
-
-  return { accessToken: newAccessToken };
+  return { accessToken: newAccessToken, refreshToken: newRefreshToken };
 };
 
-export const logout = async (token: string, res: Response) => {
+export const logout = async (token: string) => {
   if (!token) throw new AppError("No Token found", 401);
 
   const decoded = verifyRefreshToken(token);
@@ -90,6 +83,4 @@ export const logout = async (token: string, res: Response) => {
   if (!isMatch) throw new AppError("Invalid Refresh token", 401);
   user.refreshToken = undefined;
   await user.save({ validateBeforeSave: false });
-  clearRefreshTokenCookie(res);
-  return { message: "Logged out Succesfully" };
 };

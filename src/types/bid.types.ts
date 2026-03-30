@@ -7,7 +7,7 @@ export interface IBid extends Document {
   clientId: Types.ObjectId;
   coverLetter: string;
   bidAmount: number;
-  timeline: string;
+  timeline: number;
   status: BidStatus;
   attachments: string[];
   createdAt: Date;

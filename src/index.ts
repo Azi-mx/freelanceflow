@@ -11,6 +11,7 @@ import { authLimiter, globalLimiter } from "./middlewares/rateLimiter.js";
 import profilesRoutes from "./routes/profiles.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import bidRoutes from "./routes/bid.routes.js";
+import contractRoutes from "./routes/contract.routes.js";
 const app = express();
 
 app.use(helmet());
@@ -27,6 +28,7 @@ app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/profiles", profilesRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/bids", bidRoutes);
+app.use("/api/contracts", contractRoutes);
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", env: config.nodeEnv });
 });
