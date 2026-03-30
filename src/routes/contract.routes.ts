@@ -1,4 +1,4 @@
-import Router from "express";
+import { Router } from "express";
 import {
   completeContract,
   getClientContracts,
@@ -11,29 +11,25 @@ import { roleMiddleware } from "../middlewares/roleMiddleware.js";
 import { UserRole } from "../types/enum.js";
 const router = Router();
 
-router.get("/contracts/:contractId", authMiddleware, getContract);
 router.get(
-  "/contract/:clientId",
+  "/my",
   authMiddleware,
   roleMiddleware(UserRole.CLIENT),
   getClientContracts,
 );
 router.get(
-  "/contract/:freelancerId",
+  "/my/freelancer",
   authMiddleware,
   roleMiddleware(UserRole.FREELANCER),
   getFreelancerContracts,
 );
-router.put(
-  "/:contractId/terminate",
+router.get("/:contractId", authMiddleware, getContract);
+
+router.post("/:contractId/terminate", authMiddleware, terminateContract);
+router.post(
+  "/:contractId/complete",
   authMiddleware,
   roleMiddleware(UserRole.CLIENT),
-  terminateContract,
-);
-router.post(
-  "/:contractId/completeContract",
-  authMiddleware,
-  roleMiddleware(UserRole.FREELANCER),
   completeContract,
 );
 export default router;
